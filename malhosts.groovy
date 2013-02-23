@@ -7,7 +7,7 @@
 * 
 */
 
-import Host
+import HostFile
 import java.text.*
 
 def __version__ = "0.1"
@@ -28,7 +28,6 @@ def parseArgs(args) {
   }
   return options
 }
-
 
 // Method for selecting the desired hosts file
 def getUrl(legacy) {
@@ -75,7 +74,28 @@ List hosts_list = getStringFromUrl(url).split('\n')
 host_list_with_marks = malhosts_BEGIN += hosts_list
 host_list_with_marks = host_list_with_marks += malhosts_END
 
+new_hostfile = new HostFile(["someonewhocares_part": host_list_with_marks])
 
-println host_list_with_marks[127]
+// Get the current host
+List hosts_file_on_disk = new File('/etc/hosts').text.split('\n')
 
+// Find section of current malhost entries, so that they can be ignored
+def start_idx = hosts_file_on_disk.findIndexOf {
+  it == malhosts_BEGIN[0]
+}
+def stop_idx = hosts_file_on_disk.findIndexOf {
+  it == malhosts_END[0]
+}
+
+if (start_idx != -1) {
+  // let's use the part outside of old malhosts entry
+  new_hostfile.personal_part = hosts_file_on_disk[0..start_idx-1] + hosts_file_on_disk[stop_idx+1..-1]
+} else {
+  // it has not been run before, lets just add current hosts file
+  new_hostfile.personal_part = hosts_file_on_disk
+}
+
+
+new_hostfile.personal_part.each { println it }
+new_hostfile.someonewhocares_part.each { println it }
 
