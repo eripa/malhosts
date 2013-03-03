@@ -136,6 +136,7 @@ def ln = System.getProperty('line.separator')
 
 List malhosts_BEGIN = ["############ MALHOSTS BEGIN MARK, DO NOT REMOVE ############"]
 List malhosts_END = ["############ MALHOSTS END MARK, DO NOT REMOVE ############"]
+
 if (!options.q) { println "Downloading file..." }
 List hosts_list = getStringFromUrl(url).split('\n')
 
