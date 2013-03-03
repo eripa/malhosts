@@ -11,10 +11,22 @@
 * 
 */
 
-import HostFile
 import java.text.*
 
 def __version__ = "0.1"
+
+class HostFile {
+  List personal_part = []
+  List someonewhocares_part = []
+
+  String toString() {
+    // universal line break
+    def ln = System.getProperty('line.separator')
+    // join both lists.
+    def ret = this.personal_part+this.someonewhocares_part
+    return ret.join("$ln")
+  }
+}
 
 def parseArgs(args) {
   def cli = new CliBuilder(usage: 'malhosts.groovy [--help|-h] [--legacy|-l] [--dry-run|-d] [--quiet|-q]')
