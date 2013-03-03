@@ -95,8 +95,8 @@ def getStringFromUrl(url) {
 }
 
 def getEtcPath() {
-  switch(System.getProperty('os.name')) {
-    case 'Mac OS X':
+  switch(System.getProperty('os.name').split()[0]) {
+    case 'Mac':
       '/etc'
       break
     case 'Linux':
@@ -131,16 +131,20 @@ def options = parseArgs(args)
 if (!options.q) { println "malhosts ${__version__}\nlegacy: ${options.l}, dry-run: ${options.d}" }
 
 def url = getUrl(options.l)
+// get cross-platform line endings 
+def ln = System.getProperty('line.separator')
 
 List malhosts_BEGIN = ["############ MALHOSTS BEGIN MARK, DO NOT REMOVE ############"]
 List malhosts_END = ["############ MALHOSTS END MARK, DO NOT REMOVE ############"]
+if (!options.q) { println "Downloading file..." }
 List hosts_list = getStringFromUrl(url).split('\n')
 
 // Create a HostFile instance with the new hostfile and start-end-marks
 new_hostfile = new HostFile(["someonewhocares_part": malhosts_BEGIN + hosts_list + malhosts_END])
 
 // Get the current host
-List hosts_file_on_disk = new File('/etc/hosts').text.split('\n')
+def hosts_file_path = [getEtcPath(), 'hosts'].join(File.separator)
+List hosts_file_on_disk = new File(hosts_file_path).text.split(ln)
 
 // Find section of current malhost entries, so that they can be ignored
 def start_idx = hosts_file_on_disk.findIndexOf {
@@ -165,13 +169,13 @@ if (start_idx != -1) {
 if (options.d) {
   // dry-run selected let's give the user some indication on what would happen
   println '--------------- Dry run report ---------------'
-  println 'The following lines would be kept unchanged:'
+  println "The following lines (no. lines: ${new_hostfile.personal_part.size()}) would be kept unchanged:"
   println '----------------------------------------------'
   println ''
   new_hostfile.personal_part.each { println it }
   println ''
   println '--------------- Dry run report ---------------'
-  println 'A sample of the lines that will be added to the end:'
+  println "A sample of the lines (no. lines: ${new_hostfile.someonewhocares_part.size()}) that will be added to the end:"
   println '----------------------------------------------'
   println ''
   println new_hostfile.someonewhocares_part[0]
@@ -182,15 +186,13 @@ if (options.d) {
 
 if (options.c) {
   // clean out the file
-  // get cross-platform line endings 
-  def ln = System.getProperty('line.separator')
   writeToFile([getEtcPath()], 'hosts', new_hostfile.personal_part.join(ln))
-  println "Entries cleaned out!"
+  if (!options.q) { println "Entries cleaned out!" }
   System.exit(0)
 } else {
   // update file
   writeToFile([getEtcPath()], 'hosts', new_hostfile.toString())
-  println "Entries added/updated!"
+  if (!options.q) { println "Entries added/updated!" }
 }
 
 
