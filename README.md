@@ -38,7 +38,7 @@ There is a version of this file that uses 0.0.0.0 instead of 127.0.0.1 available
 
 ## Making changes
 
-Feel free to make changes.. if you do and you need to recompile the jar you will need to have [Groovy](http://groovy.codehaus.org) installed. The use the supplied GroovyWrapper script ([source](http://groovy.codehaus.org/WrappingGroovyScript)) to compile the package. For some reason that I haven't tried to find the reason to you will also have to manually update the jar with the HostFile class:
+There is a compiled Jar in the repository but feel free to make changes.. if you do and you need to recompile the jar you will need to have [Groovy](http://groovy.codehaus.org) installed. The use the supplied GroovyWrapper script ([source](http://groovy.codehaus.org/WrappingGroovyScript)) to compile the package. For some reason that I haven't tried to find the reason to you will also have to manually update the jar with the HostFile class:
 
     groovy GroovyWrapper -c -m  malhosts
     zip -u malhosts.jar HostFile.class
